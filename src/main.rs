@@ -1,4 +1,4 @@
-use inf::{executor::Executor, lexer::Lexer};
+use kalc::{executor::Executor, lexer::Lexer};
 
 fn main() {
     let mut lexer = Lexer::default();
