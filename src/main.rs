@@ -1,4 +1,4 @@
-use inf::lexer::Lexer;
+use inf::{executor::Executor, lexer::Lexer};
 
 fn main() {
     let mut lexer = Lexer::default();
@@ -6,4 +6,6 @@ fn main() {
     println!("Args: {args}");
     lexer.parse(&args).unwrap();
     println!("Lexer: {lexer:?}");
+    let mut executor = Executor::new(lexer);
+    executor.execute();
 }
