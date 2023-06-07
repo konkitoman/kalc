@@ -44,14 +44,14 @@ impl Lexer {
                 _ => return Err(format!("Invalid character at: {i}")),
             }
         }
-        self.process();
+        self.process()?;
         Ok(())
     }
 
     fn process(&mut self) -> Result<(), String> {
         let i = self.i;
         if !self.memory.is_empty() {
-            let memory = std::mem::replace(&mut self.memory, Vec::new());
+            let memory = std::mem::take(&mut self.memory);
             match Self::parse_group(memory) {
                 Ok(res) => self.tokens.push(res),
                 Err(err) => return Err(format!("Cannot parse number at: {i}, error: {err}")),

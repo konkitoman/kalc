@@ -39,10 +39,7 @@ impl Token {
     }
 
     pub fn is_num(&self) -> bool {
-        match self {
-            Token::I(_) | Token::F(_) => true,
-            _ => false,
-        }
+        matches!(self, Token::I(_) | Token::F(_))
     }
 
     pub fn calculate(&mut self) {

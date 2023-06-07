@@ -45,7 +45,6 @@ impl Executor {
     pub fn enter(token: &Token) -> Vec<(Vec<usize>, usize)> {
         let mut depth = vec![(vec![], 0)];
         let mut tokens = Vec::new();
-        let mut real_depth = 0;
         match token {
             Token::Add(t1, t2) | Token::Div(t1, t2) | Token::Sub(t1, t2) | Token::Mul(t1, t2) => {
                 tokens.push((t1.as_ref(), 0, 0));
@@ -71,33 +70,6 @@ impl Executor {
         depth
     }
 
-    fn visit(token: &mut Token, mut depths: Vec<usize>) -> Option<&mut Token> {
-        let depth = depths.pop();
-        if let Some(depth) = depth {
-            match token {
-                Token::Add(t0, t1)
-                | Token::Div(t0, t1)
-                | Token::Sub(t0, t1)
-                | Token::Mul(t0, t1) => {
-                    if depth == 0 {
-                        return Self::visit(t0, depths);
-                    } else {
-                        return Self::visit(t1, depths);
-                    }
-                }
-                Token::Group(tokens) => {
-                    if let Some(token) = tokens.get_mut(depth) {
-                        return Self::visit(token, depths);
-                    }
-                }
-                _ => {}
-            }
-        } else {
-            return Some(token);
-        }
-        None
-    }
-
     fn calculate(token: &mut Token, mut depths: Vec<usize>) {
         let depth = depths.pop();
         if let Some(depth) = depth {
@@ -121,9 +93,6 @@ impl Executor {
             }
         } else {
             token.calculate();
-            match token {
-                _ => {}
-            }
         }
     }
 }
