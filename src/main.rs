@@ -8,4 +8,8 @@ fn main() {
     println!("Lexer: {lexer:?}");
     let mut executor = Executor::new(lexer);
     executor.execute();
+    let resi = executor.get_i64();
+    let resf = executor.get_f64();
+    println!("Res i: {resi}");
+    println!("Res f: {resf}");
 }

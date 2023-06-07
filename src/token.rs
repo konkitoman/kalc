@@ -1,4 +1,4 @@
-use std::ops::Add;
+use std::ops::{Add, Div, Mul, Sub};
 
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub enum Token {
@@ -52,9 +52,21 @@ impl Token {
                     *self = t1.as_ref().clone() + t2.as_ref().clone()
                 }
             }
-            Token::Div(_, _) => {}
-            Token::Sub(_, _) => {}
-            Token::Mul(_, _) => {}
+            Token::Div(t1, t2) => {
+                if t1.is_num() && t2.is_num() {
+                    *self = t1.as_ref().clone() / t2.as_ref().clone()
+                }
+            }
+            Token::Sub(t1, t2) => {
+                if t1.is_num() && t2.is_num() {
+                    *self = t1.as_ref().clone() - t2.as_ref().clone()
+                }
+            }
+            Token::Mul(t1, t2) => {
+                if t1.is_num() && t2.is_num() {
+                    *self = t1.as_ref().clone() * t2.as_ref().clone()
+                }
+            }
             Token::Group(tokens) => {
                 if tokens.len() == 1 {
                     if let Some(token) = tokens.pop() {
@@ -82,6 +94,82 @@ impl Add for Token {
             Token::F(s) => match rhs {
                 Token::I(s1) => Token::F(s + s1 as f64),
                 Token::F(s1) => Token::F(s + s1),
+                _ => {
+                    panic!()
+                }
+            },
+            _ => {
+                panic!()
+            }
+        }
+    }
+}
+
+impl Sub for Token {
+    type Output = Token;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        match self {
+            Token::I(s) => match rhs {
+                Token::I(s1) => Token::I(s - s1),
+                Token::F(s1) => Token::F(s as f64 - s1),
+                _ => {
+                    panic!()
+                }
+            },
+            Token::F(s) => match rhs {
+                Token::I(s1) => Token::F(s - s1 as f64),
+                Token::F(s1) => Token::F(s - s1),
+                _ => {
+                    panic!()
+                }
+            },
+            _ => {
+                panic!()
+            }
+        }
+    }
+}
+impl Mul for Token {
+    type Output = Token;
+
+    fn mul(self, rhs: Self) -> Self::Output {
+        match self {
+            Token::I(s) => match rhs {
+                Token::I(s1) => Token::I(s * s1),
+                Token::F(s1) => Token::F(s as f64 * s1),
+                _ => {
+                    panic!()
+                }
+            },
+            Token::F(s) => match rhs {
+                Token::I(s1) => Token::F(s * s1 as f64),
+                Token::F(s1) => Token::F(s * s1),
+                _ => {
+                    panic!()
+                }
+            },
+            _ => {
+                panic!()
+            }
+        }
+    }
+}
+impl Div for Token {
+    type Output = Token;
+
+    fn div(self, rhs: Self) -> Self::Output {
+        match self {
+            Token::I(s) => match rhs {
+                Token::I(s1) => Token::I(s / s1),
+                Token::F(s1) => Token::F(s as f64 / s1),
+                _ => {
+                    panic!()
+                }
+            },
+            Token::F(s) => match rhs {
+                Token::I(s1) => Token::F(s / s1 as f64),
+                Token::F(s1) => Token::F(s / s1),
                 _ => {
                     panic!()
                 }

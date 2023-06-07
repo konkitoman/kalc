@@ -16,7 +16,7 @@ impl Lexer {
                     self.memory.push(char as u8)
                 }
                 ',' | '_' | ' ' => {}
-                '.' => self.memory.push(10),
+                '.' => self.memory.push(char as u8),
                 '-' => {
                     self.process()?;
                     self.tokens.push(Token::SSub);

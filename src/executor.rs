@@ -15,11 +15,31 @@ impl Executor {
         let mut depths = Self::enter(&self.group);
         depths.sort_by(|a, b| a.1.cmp(&b.1));
         depths.reverse();
-        println!("Depths: {:?}", depths);
         for depth in depths {
             Self::calculate(&mut self.group, depth.0)
         }
-        println!("Result: {:?}", self.group)
+    }
+
+    pub fn get_i64(&self) -> i64 {
+        match self.group {
+            Token::I(num) => num,
+            Token::F(num) => num as i64,
+            _ => {
+                eprintln!("You need to call execute first!");
+                0
+            }
+        }
+    }
+
+    pub fn get_f64(&self) -> f64 {
+        match self.group {
+            Token::I(num) => num as f64,
+            Token::F(num) => num,
+            _ => {
+                eprintln!("You need to call execute first!");
+                0.0
+            }
+        }
     }
 
     pub fn enter(token: &Token) -> Vec<(Vec<usize>, usize)> {
@@ -28,7 +48,6 @@ impl Executor {
         let mut real_depth = 0;
         match token {
             Token::Add(t1, t2) | Token::Div(t1, t2) | Token::Sub(t1, t2) | Token::Mul(t1, t2) => {
-                println!("OR: t1: {t1:?}, t2: {t2:?}");
                 tokens.push((t1.as_ref(), 0, 0));
                 tokens.push((t2.as_ref(), 1, 0));
             }
@@ -103,9 +122,7 @@ impl Executor {
         } else {
             token.calculate();
             match token {
-                _ => {
-                    println!("End Token: {token:?}")
-                }
+                _ => {}
             }
         }
     }
