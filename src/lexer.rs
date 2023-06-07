@@ -64,7 +64,8 @@ impl Lexer {
             let t = self.tokens.pop().unwrap();
             if let Some(token) = self.tokens.last() {
                 match token {
-                    Token::SAdd | Token::SDiv | Token::SSub | Token::SMul => {}
+                    Token::SAdd | Token::SDiv | Token::SSub | Token::SMul | Token::SGroupBeagin => {
+                    }
                     _ => self.tokens.push(Token::SMul),
                 }
             }
@@ -109,6 +110,8 @@ impl Lexer {
                 self.tokens.push(a);
             }
         }
+        #[cfg(feature = "debug")]
+        println!("Tokens: {:?}", self.tokens);
         Ok(())
     }
 
