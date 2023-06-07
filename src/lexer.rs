@@ -34,14 +34,16 @@ impl Lexer {
                     self.tokens.push(Token::SDiv);
                 }
                 '(' => {
+                    self.process()?;
                     self.tokens.push(Token::SGroupBeagin);
+                    self.process()?;
                 }
                 ')' => {
                     self.process()?;
                     self.tokens.push(Token::SGroupEnd);
                     self.process()?;
                 }
-                _ => return Err(format!("Invalid character at: {i}")),
+                _ => return Err(format!("Invalid character '{char}' at: {}", i + 1)),
             }
         }
         self.process()?;
@@ -58,7 +60,18 @@ impl Lexer {
             }
         }
 
-        let len = self.tokens.len();
+        if let Some(Token::SGroupBeagin) = self.tokens.last() {
+            let t = self.tokens.pop().unwrap();
+            if let Some(token) = self.tokens.last() {
+                match token {
+                    Token::SAdd | Token::SDiv | Token::SSub | Token::SMul => {}
+                    _ => self.tokens.push(Token::SMul),
+                }
+            }
+
+            self.tokens.push(t);
+        }
+
         if let Some(Token::SGroupEnd) = self.tokens.last() {
             self.tokens.pop();
             let mut buffer = Vec::new();
@@ -72,21 +85,28 @@ impl Lexer {
             buffer.reverse();
             self.tokens.push(Token::Group(buffer));
         }
+        let len = self.tokens.len();
         if len > 2 {
             let a = self.tokens.pop().unwrap();
             let b = self.tokens.pop().unwrap();
             let c = self.tokens.pop().unwrap();
 
-            match b {
-                Token::SAdd => self.tokens.push(Token::Add(Box::new(c), Box::new(a))),
-                Token::SSub => self.tokens.push(Token::Sub(Box::new(c), Box::new(a))),
-                Token::SMul => self.tokens.push(Token::Mul(Box::new(c), Box::new(a))),
-                Token::SDiv => self.tokens.push(Token::Div(Box::new(c), Box::new(a))),
-                _ => {
-                    self.tokens.push(c);
-                    self.tokens.push(b);
-                    self.tokens.push(a);
+            if a.is_calculabile() && c.is_calculabile() {
+                match b {
+                    Token::SAdd => self.tokens.push(Token::Add(Box::new(c), Box::new(a))),
+                    Token::SSub => self.tokens.push(Token::Sub(Box::new(c), Box::new(a))),
+                    Token::SMul => self.tokens.push(Token::Mul(Box::new(c), Box::new(a))),
+                    Token::SDiv => self.tokens.push(Token::Div(Box::new(c), Box::new(a))),
+                    _ => {
+                        self.tokens.push(c);
+                        self.tokens.push(b);
+                        self.tokens.push(a);
+                    }
                 }
+            } else {
+                self.tokens.push(c);
+                self.tokens.push(b);
+                self.tokens.push(a);
             }
         }
         Ok(())

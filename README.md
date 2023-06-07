@@ -15,5 +15,6 @@ Only supports:
 - Division /
 
 And groups like: 2 * (2 - 1) = 2
+And 2 (3) = 6
 
 But +,-,*,/ are not in the math order for now!

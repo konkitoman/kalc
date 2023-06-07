@@ -42,6 +42,10 @@ impl Token {
         matches!(self, Token::I(_) | Token::F(_))
     }
 
+    pub fn is_calculabile(&self) -> bool {
+        matches!(self, Token::I(_) | Token::F(_) | Token::Group(_))
+    }
+
     pub fn calculate(&mut self) {
         match self {
             Token::Add(t1, t2) => {

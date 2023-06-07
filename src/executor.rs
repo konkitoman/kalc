@@ -12,10 +12,11 @@ impl Executor {
     }
 
     pub fn execute(&mut self) {
-        let mut depths = Self::enter(&self.group);
-        depths.sort_by(|a, b| a.1.cmp(&b.1));
-        depths.reverse();
-        for depth in depths {
+        let mut results = Self::enter(&self.group);
+        // use sort by priority
+        results.sort_by(|a, b| a.1.cmp(&b.1));
+        results.reverse();
+        for depth in results {
             Self::calculate(&mut self.group, depth.0)
         }
     }
@@ -43,7 +44,7 @@ impl Executor {
     }
 
     pub fn enter(token: &Token) -> Vec<(Vec<usize>, usize)> {
-        let mut depth = vec![(vec![], 0)];
+        let mut results = vec![(vec![], 0)];
         let mut tokens = Vec::new();
         match token {
             Token::Add(t1, t2) | Token::Div(t1, t2) | Token::Sub(t1, t2) | Token::Mul(t1, t2) => {
@@ -52,41 +53,41 @@ impl Executor {
             }
 
             Token::Group(group) => {
-                for (i, token) in group.iter().enumerate() {
-                    tokens.push((token, i, 1))
+                for (index, token) in group.iter().enumerate() {
+                    tokens.push((token, index, 1))
                 }
             }
             _ => {}
         }
-        for (token, i, r) in tokens {
-            for (mut d, real) in Self::enter(token) {
-                d.push(i);
+        for (token, index, current_preority) in tokens {
+            for (mut d, preority) in Self::enter(token) {
+                d.push(index);
                 if token.is_num() {
                     d.remove(0);
                 }
-                depth.push((d, r + real));
+                results.push((d, current_preority + preority));
             }
         }
-        depth
+        results
     }
 
-    fn calculate(token: &mut Token, mut depths: Vec<usize>) {
-        let depth = depths.pop();
-        if let Some(depth) = depth {
+    fn calculate(token: &mut Token, mut indexes: Vec<usize>) {
+        let index = indexes.pop();
+        if let Some(index) = index {
             match token {
                 Token::Add(t0, t1)
                 | Token::Div(t0, t1)
                 | Token::Sub(t0, t1)
                 | Token::Mul(t0, t1) => {
-                    if depth == 0 {
-                        Self::calculate(t0, depths)
+                    if index == 0 {
+                        Self::calculate(t0, indexes)
                     } else {
-                        Self::calculate(t1, depths)
+                        Self::calculate(t1, indexes)
                     }
                 }
                 Token::Group(tokens) => {
-                    if let Some(token) = tokens.get_mut(depth) {
-                        Self::calculate(token, depths)
+                    if let Some(token) = tokens.get_mut(index) {
+                        Self::calculate(token, indexes)
                     }
                 }
                 _ => {}

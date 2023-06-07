@@ -1,7 +1,7 @@
 [package]
 name = "kalc"
 description = "Is a calculator for math"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["konkitoman"]
 license = "MPL-2.0"
