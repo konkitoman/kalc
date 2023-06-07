@@ -26,7 +26,6 @@ impl Executor {
         let mut depth = vec![vec![]];
         let mut tokens = Vec::new();
         match token {
-            Token::I32(_) | Token::I64(_) => {}
             Token::Add(t1, t2) | Token::Div(t1, t2) | Token::Sub(t1, t2) | Token::Mul(t1, t2) => {
                 println!("OR: t1: {t1:?}, t2: {t2:?}");
                 tokens.push((t1.as_ref(), 0));

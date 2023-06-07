@@ -2,10 +2,8 @@ use std::ops::Add;
 
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub enum Token {
-    I32(i32),
-    I64(i64),
-    Intiger(Vec<Token>),
-    Decimal(Box<Token>, Box<Token>),
+    I(i64),
+    F(f64),
 
     Add(Box<Token>, Box<Token>),
     Div(Box<Token>, Box<Token>),
@@ -42,7 +40,7 @@ impl Token {
 
     pub fn is_num(&self) -> bool {
         match self {
-            Token::I32(_) | Token::I64(_) | Token::Intiger(_) | Token::Decimal(_, _) => true,
+            Token::I(_) | Token::F(_) => true,
             _ => false,
         }
     }
@@ -74,32 +72,20 @@ impl Add for Token {
 
     fn add(self, rhs: Self) -> Self::Output {
         match self {
-            Token::I32(s) => match rhs {
-                Token::I32(s1) => {
-                    if s < i32::MAX / 2 && s1 < i32::MAX / 2 {
-                        Token::I32(s + s1)
-                    } else {
-                        Token::I64(s as i64 + s1 as i64)
-                    }
-                }
-                Token::I64(s1) => Token::I64(s as i64 + s1),
-                Token::Intiger(_) => todo!(),
-                Token::Decimal(_, _) => todo!(),
+            Token::I(s) => match rhs {
+                Token::I(s1) => Token::I(s + s1),
+                Token::F(s1) => Token::F(s as f64 + s1),
                 _ => {
                     panic!()
                 }
             },
-            Token::I64(s) => match rhs {
-                Token::I32(s1) => Token::I64(s + s1 as i64),
-                Token::I64(s1) => Token::I64(s + s1),
-                Token::Intiger(_) => todo!(),
-                Token::Decimal(_, _) => todo!(),
+            Token::F(s) => match rhs {
+                Token::I(s1) => Token::F(s + s1 as f64),
+                Token::F(s1) => Token::F(s + s1),
                 _ => {
                     panic!()
                 }
             },
-            Token::Intiger(_) => todo!(),
-            Token::Decimal(_, _) => todo!(),
             _ => {
                 panic!()
             }

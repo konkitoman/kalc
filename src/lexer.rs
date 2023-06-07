@@ -13,7 +13,7 @@ impl Lexer {
             self.i = i;
             match char {
                 '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => {
-                    self.memory.push(char as u8 - 48)
+                    self.memory.push(char as u8)
                 }
                 ',' | '_' | ' ' => {}
                 '.' => self.memory.push(10),
@@ -94,101 +94,18 @@ impl Lexer {
 
     fn parse_group(data: Vec<u8>) -> Result<Token, String> {
         // if is float 10 reprezents '.'
-        if data.contains(&10) {
-            let segments = data
-                .split(|n| *n == 10)
-                .map(|d| d.to_vec())
-                .collect::<Vec<Vec<u8>>>();
-            if segments.len() != 2 {
-                return Err(format!("In a decimal number need to be only one ."));
+        if data.contains(&b'.') {
+            let data = String::from_utf8(data).unwrap();
+            match data.parse::<f64>() {
+                Ok(num) => Ok(Token::F(num)),
+                Err(_) => Err("Cannot parse number".into()),
             }
-            let a = Self::parse_num(segments[0].to_vec())?;
-            let b = Self::parse_num(segments[1].to_vec())?;
-            Ok(Token::Decimal(Box::new(a), Box::new(b)))
         } else {
-            Self::parse_num(data)
+            let data = String::from_utf8(data).unwrap();
+            match data.parse::<i64>() {
+                Ok(num) => Ok(Token::I(num)),
+                Err(_) => Err("Cannot parse number".into()),
+            }
         }
-    }
-
-    fn parse_num(data: Vec<u8>) -> Result<Token, String> {
-        if data.len() < 10 {
-            let mut num = 0i32;
-            let mut data = data;
-            data.reverse();
-            let mut i = 1;
-            for b in data {
-                if b > 0 {
-                    num += b as i32 * i;
-                }
-                i *= 10;
-            }
-            return Ok(Token::I32(num));
-        } else if data.len() < 19 {
-            let mut num = 0i64;
-            let mut data = data;
-            data.reverse();
-            let mut i = 1;
-            for b in data {
-                if b > 0 {
-                    num += b as i64 * i;
-                }
-                i *= 10;
-            }
-            return Ok(Token::I64(num));
-        } else {
-            let (a, b) = data.split_at(18);
-            let (a, b) = (a.to_vec(), b.to_vec());
-            let a = Self::parse_num(a)?;
-            let b = Self::parse_num(b)?;
-            let mut res = vec![];
-            match a {
-                Token::Intiger(a) => {
-                    for b in a {
-                        res.push(b)
-                    }
-                }
-                _ => res.push(a),
-            }
-            match b {
-                Token::Intiger(a) => {
-                    for b in a {
-                        res.push(b)
-                    }
-                }
-                _ => res.push(b),
-            }
-            return Ok(Token::Intiger(res));
-        }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::token::Token;
-
-    use super::Lexer;
-
-    #[test]
-    fn parse_num() {
-        assert_eq!(Lexer::parse_num(vec![]).unwrap(), Token::I32(0));
-        assert_eq!(
-            Lexer::parse_num(vec![9, 9, 9, 9, 9, 9, 9, 9, 9]).unwrap(),
-            Token::I32(999999999)
-        );
-        assert_eq!(
-            Lexer::parse_num(vec![9, 9, 9, 9, 9, 9, 9, 9, 9, 0]).unwrap(),
-            Token::I64(9999999990)
-        );
-        assert_eq!(
-            Lexer::parse_num(vec![9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]).unwrap(),
-            Token::I64(999999999999999999)
-        );
-        assert_eq!(
-            Lexer::parse_num(vec![
-                9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 0
-            ])
-            .unwrap(),
-            Token::Intiger(vec![Token::I64(999999999999999999), Token::I32(0)])
-        );
     }
 }
