@@ -3,7 +3,7 @@ use crate::token::Token;
 #[derive(Default, Debug)]
 pub struct Lexer {
     pub tokens: Vec<Token>,
-    pub memory: Vec<u8>,
+    pub memory: String,
     pub i: usize,
 }
 
@@ -12,11 +12,9 @@ impl Lexer {
         for (i, char) in data.chars().enumerate() {
             self.i = i;
             match char {
-                '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => {
-                    self.memory.push(char as u8)
-                }
+                '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => self.memory.push(char),
                 ',' | '_' | ' ' => {}
-                '.' => self.memory.push(char as u8),
+                '.' => self.memory.push(char),
                 '-' => {
                     self.process()?;
                     self.tokens.push(Token::SSub);
@@ -60,32 +58,39 @@ impl Lexer {
             }
         }
 
-        if let Some(Token::SGroupBeagin) = self.tokens.last() {
-            let t = self.tokens.pop().unwrap();
-            if let Some(token) = self.tokens.last() {
-                match token {
-                    Token::SAdd | Token::SDiv | Token::SSub | Token::SMul | Token::SGroupBeagin => {
+        if let Some(token) = self.tokens.last() {
+            match token {
+                Token::SGroupBeagin => {
+                    let t = self.tokens.pop().unwrap();
+                    if let Some(token) = self.tokens.last() {
+                        match token {
+                            Token::SAdd
+                            | Token::SDiv
+                            | Token::SSub
+                            | Token::SMul
+                            | Token::SGroupBeagin => {}
+                            _ => self.tokens.push(Token::SMul),
+                        }
                     }
-                    _ => self.tokens.push(Token::SMul),
-                }
-            }
 
-            self.tokens.push(t);
+                    self.tokens.push(t);
+                }
+                Token::SGroupEnd => {
+                    self.tokens.pop();
+                    let mut buffer = Vec::new();
+                    while let Some(token) = self.tokens.pop() {
+                        if let Token::SGroupBeagin = token {
+                            break;
+                        }
+                        buffer.push(token)
+                    }
+                    buffer.reverse();
+                    self.tokens.push(Token::Group(buffer));
+                }
+                _ => {}
+            }
         }
 
-        if let Some(Token::SGroupEnd) = self.tokens.last() {
-            self.tokens.pop();
-            let mut buffer = Vec::new();
-            while let Some(token) = self.tokens.pop() {
-                if let Token::SGroupBeagin = token {
-                    break;
-                } else {
-                    buffer.push(token)
-                }
-            }
-            buffer.reverse();
-            self.tokens.push(Token::Group(buffer));
-        }
         let len = self.tokens.len();
         if len > 2 {
             let a = self.tokens.pop().unwrap();
@@ -115,16 +120,13 @@ impl Lexer {
         Ok(())
     }
 
-    fn parse_group(data: Vec<u8>) -> Result<Token, String> {
-        // if is float 10 reprezents '.'
-        if data.contains(&b'.') {
-            let data = String::from_utf8(data).unwrap();
+    fn parse_group(data: String) -> Result<Token, String> {
+        if data.contains('.') {
             match data.parse::<f64>() {
                 Ok(num) => Ok(Token::F(num)),
                 Err(_) => Err("Cannot parse number".into()),
             }
         } else {
-            let data = String::from_utf8(data).unwrap();
             match data.parse::<i64>() {
                 Ok(num) => Ok(Token::I(num)),
                 Err(_) => Err("Cannot parse number".into()),
