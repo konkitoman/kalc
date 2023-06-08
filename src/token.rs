@@ -87,6 +87,14 @@ impl Token {
         )
     }
 
+    pub fn is_zero(&self) -> bool {
+        match self {
+            Token::I(t) => *t == 0,
+            Token::F(t) => *t == 0.0,
+            _ => false,
+        }
+    }
+
     pub fn calculate(&mut self) {
         match self {
             Token::Add(t1, t2) => {
@@ -96,7 +104,11 @@ impl Token {
             }
             Token::Div(t1, t2) => {
                 if t1.is_num() && t2.is_num() {
-                    *self = t1.as_ref().clone() / t2.as_ref().clone()
+                    if t2.is_zero() {
+                        *self = Token::I(0)
+                    } else {
+                        *self = t1.as_ref().clone() / t2.as_ref().clone()
+                    }
                 }
             }
             Token::Sub(t1, t2) => {
