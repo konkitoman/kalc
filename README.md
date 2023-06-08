@@ -13,8 +13,11 @@ Only supports:
 - Substraction -
 - Multiplication *
 - Division /
+- Sin sin()
+- Cos cos()
 
 And groups like: 2 * (2 - 1) = 2
 And 2 (3) = 6
+And sin(1) = 0.8414709848078965
 
 But +,-,*,/ are not in the math order for now!
