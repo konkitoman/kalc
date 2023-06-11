@@ -11,7 +11,8 @@ impl Executor {
         }
     }
 
-    pub fn execute(&mut self) {
+    /// Returns the steps
+    pub fn execute(&mut self) -> Vec<Token> {
         let mut results = Self::enter(&self.group);
         // use sort by priority
         results.sort_by(|a, b| a.1.cmp(&b.1));
@@ -32,6 +33,7 @@ impl Executor {
         for (i, step) in steps.iter().enumerate() {
             println!("Step{i}: {step}")
         }
+        steps
     }
 
     pub fn get_i64(&self) -> i64 {
