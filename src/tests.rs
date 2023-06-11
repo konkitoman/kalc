@@ -22,3 +22,9 @@ fn mul() {
 fn div() {
     assert_eq!(kalc_i64("6 / 2").unwrap(), 3);
 }
+
+#[test]
+fn order() {
+    assert_eq!(kalc_i64("2(3-1)").unwrap(), 4);
+    assert_eq!(kalc_i64("2(3-(2 - 1))").unwrap(), 4)
+}
