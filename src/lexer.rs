@@ -148,7 +148,7 @@ impl Lexer {
         }
 
         #[cfg(feature = "debug")]
-        println!("Tokens: {:?}", self.tokens);
+        println!("Lexer State: {}", Token::Group(self.tokens.clone()));
         Ok(())
     }
 

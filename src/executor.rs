@@ -16,8 +16,21 @@ impl Executor {
         // use sort by priority
         results.sort_by(|a, b| a.1.cmp(&b.1));
         results.reverse();
+        let mut steps = Vec::with_capacity(results.len());
+        steps.push(self.group.clone());
         for depth in results {
-            Self::calculate(&mut self.group, depth.0)
+            Self::calculate(&mut self.group, depth.0);
+            if let Some(last) = steps.last() {
+                if *last == self.group {
+                    continue;
+                }
+            }
+            steps.push(self.group.clone())
+        }
+
+        #[cfg(feature = "debug")]
+        for (i, step) in steps.iter().enumerate() {
+            println!("Step{i}: {step}")
         }
     }
 

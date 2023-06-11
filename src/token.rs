@@ -1,4 +1,7 @@
-use std::ops::{Add, Div, Mul, Sub};
+use std::{
+    fmt::Display,
+    ops::{Add, Div, Mul, Sub},
+};
 
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub enum Token {
@@ -31,6 +34,42 @@ pub enum Token {
     SGroupEnd,
 
     Inf,
+}
+
+impl Display for Token {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Token::I(t0) => write!(f, "{t0}"),
+            Token::F(t0) => write!(f, "{t0}"),
+            Token::Add(t0, t1) => write!(f, "{t0} + {t1}"),
+            Token::Div(t0, t1) => write!(f, "{t0} / {t1}"),
+            Token::Sub(t0, t1) => write!(f, "{t0} - {t1}"),
+            Token::Mul(t0, t1) => write!(f, "{t0} * {t1}"),
+            Token::Sin(t0) => write!(f, "sin({t0})"),
+            Token::Cos(t0) => write!(f, "cos({t0})"),
+            Token::Pow(t0, t1) => write!(f, "pow({t0}, {t1})"),
+            Token::Sqrt(t0) => write!(f, "sqrt({t0})"),
+            Token::SAdd => f.write_str("+"),
+            Token::SDiv => f.write_str("/"),
+            Token::SSub => f.write_str("-"),
+            Token::SMul => f.write_str("*"),
+            Token::SSin => f.write_str("sin"),
+            Token::SCos => f.write_str("cos"),
+            Token::SPow => f.write_str("pow"),
+            Token::SSqrt => f.write_str("sqrt"),
+            Token::SGroupBeagin => f.write_str("("),
+            Token::SGroupEnd => f.write_str(")"),
+            Token::Inf => f.write_str("inf"),
+            Token::Group(tokens) => {
+                write!(f, "( ")?;
+                for token in tokens {
+                    write!(f, "{token} ")?
+                }
+                write!(f, ")")?;
+                Ok(())
+            }
+        }
+    }
 }
 
 impl Token {
