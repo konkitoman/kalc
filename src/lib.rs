@@ -1,5 +1,7 @@
 mod executor;
 mod lexer;
+#[cfg(test)]
+mod tests;
 mod token;
 
 pub use executor::Executor;
