@@ -15,9 +15,15 @@ Only supports:
 - Division /
 - Sin sin()
 - Cos cos()
+- Pow pow()
+- Sqrt sqrt() 
 
 And groups like: 2 * (2 - 1) = 2
+
 And 2 (3) = 6
+
 And sin(1) = 0.8414709848078965
+
+And sqrt(pow(2, 4)) = 4
 
 But +,-,*,/ are not in the math order for now!

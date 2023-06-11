@@ -47,10 +47,16 @@ impl Executor {
         let mut results = vec![(vec![], 0)];
         let mut tokens = Vec::new();
         match token {
-            Token::Add(t1, t2) | Token::Div(t1, t2) | Token::Sub(t1, t2) | Token::Mul(t1, t2) => {
+            Token::Add(t1, t2)
+            | Token::Div(t1, t2)
+            | Token::Sub(t1, t2)
+            | Token::Mul(t1, t2)
+            | Token::Pow(t1, t2) => {
                 tokens.push((t1.as_ref(), 0, 0));
                 tokens.push((t2.as_ref(), 1, 0));
             }
+
+            Token::Sin(t0) | Token::Cos(t0) | Token::Sqrt(t0) => tokens.push((t0.as_ref(), 0, 0)),
 
             Token::Group(group) => {
                 for (index, token) in group.iter().enumerate() {
@@ -78,13 +84,15 @@ impl Executor {
                 Token::Add(t0, t1)
                 | Token::Div(t0, t1)
                 | Token::Sub(t0, t1)
-                | Token::Mul(t0, t1) => {
+                | Token::Mul(t0, t1)
+                | Token::Pow(t0, t1) => {
                     if index == 0 {
                         Self::calculate(t0, indexes)
                     } else {
                         Self::calculate(t1, indexes)
                     }
                 }
+                Token::Sin(t0) | Token::Cos(t0) | Token::Sqrt(t0) => Self::calculate(t0, indexes),
                 Token::Group(tokens) => {
                     if let Some(token) = tokens.get_mut(index) {
                         Self::calculate(token, indexes)

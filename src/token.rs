@@ -12,6 +12,8 @@ pub enum Token {
 
     Sin(Box<Token>),
     Cos(Box<Token>),
+    Pow(Box<Token>, Box<Token>),
+    Sqrt(Box<Token>),
 
     Group(Vec<Token>),
 
@@ -22,6 +24,8 @@ pub enum Token {
 
     SSin,
     SCos,
+    SPow,
+    SSqrt,
 
     SGroupBeagin,
     SGroupEnd,
@@ -49,6 +53,13 @@ impl Token {
     pub fn cos(token: Token) -> Token {
         Token::Cos(Box::new(token))
     }
+
+    pub fn pow(a: Token, b: Token) -> Token {
+        Token::Pow(Box::new(a), Box::new(b))
+    }
+    pub fn sqrt(token: Token) -> Token {
+        Token::Sqrt(Box::new(token))
+    }
 }
 
 impl Token {
@@ -58,8 +69,13 @@ impl Token {
             Token::Div(t0, t1) => t0.is_num() && t1.is_num(),
             Token::Sub(t0, t1) => t0.is_num() && t1.is_num(),
             Token::Mul(t0, t1) => t0.is_num() && t1.is_num(),
+
             Token::Sin(t0) => t0.is_num(),
             Token::Cos(t0) => t0.is_num(),
+
+            Token::Pow(t0, t1) => t0.is_num() && t1.is_num(),
+            Token::Sqrt(t0) => t0.is_num(),
+
             Token::Group(tokens) => {
                 let a: usize = tokens.iter().map(|token| token.is_num() as usize).sum();
                 a == tokens.len()
@@ -83,7 +99,9 @@ impl Token {
                 | Token::Mul(_, _)
                 | Token::Div(_, _)
                 | Token::Sin(_)
-                | Token::Cos(_),
+                | Token::Cos(_)
+                | Token::Pow(_, _)
+                | Token::Sqrt(_)
         )
     }
 
@@ -121,6 +139,7 @@ impl Token {
                     *self = t1.as_ref().clone() * t2.as_ref().clone()
                 }
             }
+
             Token::Sin(token) => match token.as_ref() {
                 Token::I(t1) => *self = Token::F((*t1 as f64).sin()),
                 Token::F(t1) => *self = Token::F(t1.sin()),
@@ -131,6 +150,26 @@ impl Token {
                 Token::F(t1) => *self = Token::F(t1.cos()),
                 _ => {}
             },
+
+            Token::Pow(t1, t2) => match t1.as_ref() {
+                Token::I(t1) => match t2.as_ref() {
+                    Token::I(t2) => *self = Token::F((*t1 as f64).powf(*t2 as f64)),
+                    Token::F(t2) => *self = Token::F((*t1 as f64).powf(*t2)),
+                    _ => {}
+                },
+                Token::F(t1) => match t2.as_ref() {
+                    Token::I(t2) => *self = Token::F(t1.powf(*t2 as f64)),
+                    Token::F(t2) => *self = Token::F(t1.powf(*t2)),
+                    _ => {}
+                },
+                _ => {}
+            },
+            Token::Sqrt(t1) => match t1.as_ref() {
+                Token::I(t1) => *self = Token::F((*t1 as f64).sqrt()),
+                Token::F(t1) => *self = Token::F(t1.sqrt()),
+                _ => {}
+            },
+
             Token::Group(tokens) => {
                 if tokens.len() == 1 {
                     if let Some(token) = tokens.pop() {
