@@ -1,4 +1,4 @@
-use crate::kalc_i64;
+use crate::{kalc_f64, kalc_i64};
 
 #[test]
 fn add() {
@@ -27,4 +27,9 @@ fn div() {
 fn order() {
     assert_eq!(kalc_i64("2(3-1)").unwrap(), 4);
     assert_eq!(kalc_i64("2(3-(2 - 1))").unwrap(), 4)
+}
+
+#[test]
+fn sin() {
+    assert_eq!(kalc_f64("sin(1)").unwrap(), 0.8414709848078965)
 }
