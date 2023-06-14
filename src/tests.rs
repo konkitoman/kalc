@@ -31,5 +31,6 @@ fn order() {
 
 #[test]
 fn sin() {
-    assert_eq!(kalc_f64("sin(1)").unwrap(), 0.8414709848078965)
+    assert_eq!(kalc_f64("sin(1)").unwrap(), 0.8414709848078965);
+    assert_eq!(kalc_f64("sin(1) - cos(1)").unwrap(), 0.30116867893975674)
 }
