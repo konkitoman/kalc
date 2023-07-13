@@ -1,5 +1,5 @@
 [package]
-name = "kalc"
+name = "kalc-kman"
 description = "Is a calculator for math"
 version = "0.1.4"
 edition = "2021"

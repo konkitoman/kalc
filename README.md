@@ -1,6 +1,6 @@
 # Kalc
 
-[![Crates.io](https://img.shields.io/crates/v/kalc.svg)](https://crates.io/crates/kalc)
+[![Crates.io](https://img.shields.io/crates/v/kalc-kman.svg)](https://crates.io/crates/kalc-kman)
 
 Is a simple calculator!
 I can be used where we have an number input for an user and the user can put a formula,
