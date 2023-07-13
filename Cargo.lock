@@ -3,5 +3,5 @@
 version = 3
 
 [[package]]
-name = "kalc"
+name = "kalc-kman"
 version = "0.1.4"
